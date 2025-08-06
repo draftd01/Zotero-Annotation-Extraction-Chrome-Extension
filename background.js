@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Zotero Mod - Annotation Extractor",
+  "version": "1.0",
+  "description": "This mod extracts annotations on the Zotero browser and writes them to a text file. This way you can feed the text files to your AI of choice and speed up the writing process of your intro sections.",
+  
+  "permissions": [
+    "activeTab"
+  ],
+  
+  "host_permissions": [
+    "https://www.zotero.org/*/items/*/attachment/*"
+  ],
+  
+  "content_scripts": [
+    {
+      "matches": ["https://www.zotero.org/*/items/*/attachment/*"],
+      "js": ["content-script.js"]
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Extract Content"
+  }
+}

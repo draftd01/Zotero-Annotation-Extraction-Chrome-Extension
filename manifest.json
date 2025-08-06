@@ -1,0 +1,21 @@
+{
+  "name": "E-learning focus tool",
+  "description": "Tool for helping you focus when learning online",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["scripting", "tabs"],
+  "host_permissions": ["https://www.youtube.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "E-learning focus tool"
+  }
+}
