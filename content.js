@@ -2,10 +2,10 @@
 function extractContentToFile() {
   try {
     // Find the parent element (defaults to body if not specified)
-    const parentElement = document.querySelector(".annotations");
+    const parentElement = document.querySelector(".reader-wrapper iframe").contentDocument.firstElementChild.querySelector(".annotations");
     
     if (!parentElement) {
-      console.error('Parent element not found:', parentSelector);
+      console.error('Parent element not found:', parentElement);
       return;
     }
     
@@ -21,9 +21,9 @@ function extractContentToFile() {
     const extractedText = Array.from(contentElements)
       .map((element, index) => {
         const text = element.innerText.trim();
-        return `Content ${index + 1}:\n${text}\n`;
+        return `Annotation ${index + 1}:\n${text}\n`;
       })
-      .join('\n---\n\n');
+      .join('\n\n');
     
     // Create the final content with metadata
     const finalContent = `Content extracted from: ${window.location.href}\n` +
@@ -74,8 +74,17 @@ function downloadTextFile(content, filename) {
 // Function to add download button to toolbar
 function addDownloadBtn() {
   try {
+    parentElement = document.querySelector(".reader-wrapper iframe").contentDocument.firstElementChild
+    
+    console.log(parentElement)
     // Find the toolbar end element
-    const endElement = document.querySelector('.toolbar .end');
+    /*try {
+      console.log(parentElement.contentDocument);   // or iframe.contentWindow.document
+    } catch (e) {
+      console.error('Cross-origin iframe – access denied:', e);
+    }*/
+    var endElement = parentElement.querySelector('.toolbar .end');
+    console.log(endElement)
     
     if (!endElement) {
       console.error('Toolbar end element not found');
@@ -96,30 +105,42 @@ function addDownloadBtn() {
       height: 28px;
       margin-right: 8px;
       background: transparent;
-      border: 1px solid #ccc;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 4px;
       cursor: pointer;
       display: flex;
-      transition: background-color 0.2s ease;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
       flex-shrink: 0;
+      color: inherit;
+      opacity: 0.7;
     `;
     
-    // Add hover effect
+    // Add hover and active effects that work in both themes
     downloadButton.addEventListener('mouseenter', () => {
-      downloadButton.style.backgroundColor = '#f0f0f0';
+      downloadButton.style.opacity = '1';
+      downloadButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+      downloadButton.style.borderColor = 'rgba(255, 255, 255, 0.3)';
     });
     
     downloadButton.addEventListener('mouseleave', () => {
+      downloadButton.style.opacity = '0.7';
       downloadButton.style.backgroundColor = 'transparent';
+      downloadButton.style.borderColor = 'rgba(255, 255, 255, 0.2)';
     });
     
-    // Create download icon (SVG)
+    downloadButton.addEventListener('mousedown', () => {
+      downloadButton.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+    });
+    
+    downloadButton.addEventListener('mouseup', () => {
+      downloadButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    });
+    
+    // Create download icon (SVG) with currentColor for theme compatibility
     downloadButton.innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="7,10 12,15 17,10"/>
-        <line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
+      <svg height="16" width="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12.5535 16.5061C12.4114 16.6615 12.2106 16.75 12 16.75C11.7894 16.75 11.5886 16.6615 11.4465 16.5061L7.44648 12.1311C7.16698 11.8254 7.18822 11.351 7.49392 11.0715C7.79963 10.792 8.27402 10.8132 8.55352 11.1189L11.25 14.0682V3C11.25 2.58579 11.5858 2.25 12 2.25C12.4142 2.25 12.75 2.58579 12.75 3V14.0682L15.4465 11.1189C15.726 10.8132 16.2004 10.792 16.5061 11.0715C16.8118 11.351 16.833 11.8254 16.5535 12.1311L12.5535 16.5061Z" fill="#919191"></path> <path d="M3.75 15C3.75 14.5858 3.41422 14.25 3 14.25C2.58579 14.25 2.25 14.5858 2.25 15V15.0549C2.24998 16.4225 2.24996 17.5248 2.36652 18.3918C2.48754 19.2919 2.74643 20.0497 3.34835 20.6516C3.95027 21.2536 4.70814 21.5125 5.60825 21.6335C6.47522 21.75 7.57754 21.75 8.94513 21.75H15.0549C16.4225 21.75 17.5248 21.75 18.3918 21.6335C19.2919 21.5125 20.0497 21.2536 20.6517 20.6516C21.2536 20.0497 21.5125 19.2919 21.6335 18.3918C21.75 17.5248 21.75 16.4225 21.75 15.0549V15C21.75 14.5858 21.4142 14.25 21 14.25C20.5858 14.25 20.25 14.5858 20.25 15C20.25 16.4354 20.2484 17.4365 20.1469 18.1919C20.0482 18.9257 19.8678 19.3142 19.591 19.591C19.3142 19.8678 18.9257 20.0482 18.1919 20.1469C17.4365 20.2484 16.4354 20.25 15 20.25H9C7.56459 20.25 6.56347 20.2484 5.80812 20.1469C5.07435 20.0482 4.68577 19.8678 4.40901 19.591C4.13225 19.3142 3.9518 18.9257 3.85315 18.1919C3.75159 17.4365 3.75 16.4354 3.75 15Z" fill="#919191"></path> </g></svg>
     `;
     
     // Add click event listener
@@ -127,9 +148,12 @@ function addDownloadBtn() {
       e.preventDefault();
       e.stopPropagation();
       
-      // Add visual feedback
-      downloadButton.style.backgroundColor = '#e0e0e0';
+      // Add visual feedback that works in both themes
+      downloadButton.style.opacity = '0.5';
+      downloadButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+      
       setTimeout(() => {
+        downloadButton.style.opacity = '0.7';
         downloadButton.style.backgroundColor = 'transparent';
       }, 150);
       
@@ -150,6 +174,13 @@ function addDownloadBtn() {
   }
 }
 
-window.addEventListener("load", () => {
-  addDownloadBtn()
-})
+function checkContentLoaded(){
+  console.log("checking content")
+  if(document.querySelector(".reader-wrapper iframe")){
+      addDownloadBtn()
+      clearInterval(timer)
+  }
+}
+
+timer = setInterval(checkContentLoaded, 1000)
+
