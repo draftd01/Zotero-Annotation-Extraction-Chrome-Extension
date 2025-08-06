@@ -74,17 +74,9 @@ function downloadTextFile(content, filename) {
 // Function to add download button to toolbar
 function addDownloadBtn() {
   try {
-    parentElement = document.querySelector(".reader-wrapper iframe").contentDocument.firstElementChild
-    
-    console.log(parentElement)
-    // Find the toolbar end element
-    /*try {
-      console.log(parentElement.contentDocument);   // or iframe.contentWindow.document
-    } catch (e) {
-      console.error('Cross-origin iframe – access denied:', e);
-    }*/
+    var parentElement = document.querySelector(".reader-wrapper iframe").contentDocument.firstElementChild
+
     var endElement = parentElement.querySelector('.toolbar .end');
-    console.log(endElement)
     
     if (!endElement) {
       console.error('Toolbar end element not found');
